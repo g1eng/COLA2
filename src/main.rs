@@ -1,4 +1,5 @@
-use std::io::{stdin,BufRead,StdinLock};
+use std::io::{stdin,BufRead};
+use clap::{App, Arg, ArgMatches};
 
 struct Cola2 {
     debug: bool,
@@ -69,41 +70,50 @@ impl Cola2 {
             p: p,
         };
         runner.f(p);
-
-        //pretty
-        /*
-        if runner.serialize {
-            println!("\n\n\n\n\n\n\n\n\n\n\n\n");
-        }
-        */
     }
 }
 
-fn calc_foreach(raw_line: &str) {
-    let mut numbers = raw_line.split_whitespace().collect::<Vec<_>>();
-    while let Some(n) = numbers.pop() {
-        if let Ok(n) = n.parse::<u128>() {
-            //serialize
-            //Cola2::run(n, false, true);
-
-            //debug
-            //Cola2::run(n, true, false);
-
-            //plain
-            Cola2::run(n, false, false);
-        }
-    }
-}
-
-fn read_stdin(reader :StdinLock) {
-    for line in reader.lines() {
-        let line = line.unwrap();
-        calc_foreach(&line);
-    }
+fn get_cli_matcher() -> ArgMatches<'static> {
+    App::new("cola2")
+        .version("0.1.0")
+        .author("Nomura Suzume")
+        .arg(
+            Arg::with_name("encode")
+                .short("E")
+                .help("encode output with MAD format")
+                .required(false)
+        )
+        .arg(
+            Arg::with_name("debug")
+                .short("d")
+                .help("show verbose output")
+                .takes_value(false)
+                .required(false)
+        )
+        .arg(
+            Arg::with_name("split")
+                .short("s")
+                .value_name("NUM")
+                .takes_value(true)
+                .help("split serialized output with newline at the specified boundary")
+                .required(false)
+        )
+        .get_matches()
 }
 
 fn main() {
+    let app = get_cli_matcher();
+
     let stdin = stdin();
     let reader = stdin.lock();
-    read_stdin(reader);
+
+    for line in reader.lines() {
+        let line = line.unwrap();
+        let mut numbers = line.split_whitespace().collect::<Vec<_>>();
+        while let Some(n) = numbers.pop() {
+            if let Ok(n) = n.parse::<u128>() {
+                Cola2::run(n, app.is_present("debug"), app.is_present("encode"));
+            }
+        }
+    }
 }
