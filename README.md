@@ -3,7 +3,7 @@
 COLA2 is a simple solver program for Collatz conjecture (known as `3n+1` problem).
 About Collatz conjencture, see [wikipedia](https://en.wikipedia.org/wiki/3n%2B1). 
 
-In this program, map `n|->n/2` is called as A, and map `n|->3n+1` is called as B.
+In this program, the map for even `n|->n/2` is called A, and the map for odd `n|->3n+1` is called B.
 
 # Requirement
 
