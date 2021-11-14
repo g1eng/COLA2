@@ -14,22 +14,26 @@ impl Cola2 {
         self.ret % 8 == 0 && self.ret != 0
     }
 
+    //opb is operation A for collats' map
     fn opa(&mut self, p :u128) -> u128 {
         if self.serialize {
             print!("A");
         } else if self.debug {
-            print!(" -> {} ", p);
+            print!("{} -> ", p);
         }
         self.f(p / 2)
     }
+
+    //opb is operation B for collats' map
     fn opb(&mut self, p :u128) -> u128 {
         if self.serialize {
             print!("B");
         } else if self.debug {
-            print!(" -> {} ", p)
+            print!("{} -> ", p)
         }
         self.f(p * 3 + 1)
     }
+
     fn f (&mut self, p :u128) -> u128 {
         if p == 0 {
             panic!("undef");
@@ -38,7 +42,7 @@ impl Cola2 {
             if self.serialize {
                 println!("");
             } else if self.debug {
-                println!(" -> 1 [{}]", self.ret);
+                println!("1 [len={}]", self.ret);
             } else {
                 println!("{} {}", self.p, self.ret);
             }
@@ -50,10 +54,7 @@ impl Cola2 {
                     println!("")
                 }*/
                 //print!(" ");
-                println!("");
-            } else if self.debug {
-                print!(" \n [{}] ",self.ret);
-            }
+            } 
         }
         self.ret = self.ret + 1;
         match p % 2 {
@@ -76,11 +77,11 @@ impl Cola2 {
 fn get_cli_matcher() -> ArgMatches<'static> {
     App::new("cola2")
         .version("0.1.0")
-        .author("Nomura Suzume")
+        .author("Nomura Suzume <suzume315@g00.g1e.org>")
         .arg(
             Arg::with_name("encode")
                 .short("E")
-                .help("encode output with MAD format")
+                .help("encode output with CPD format")
                 .required(false)
         )
         .arg(
@@ -95,7 +96,7 @@ fn get_cli_matcher() -> ArgMatches<'static> {
                 .short("s")
                 .value_name("NUM")
                 .takes_value(true)
-                .help("split serialized output with newline at the specified boundary")
+                .help("split serialized octet with newline for specified blocks")
                 .required(false)
         )
         .get_matches()
