@@ -1,44 +1,43 @@
 use std::io::{stdin,BufRead};
+use num_bigint::BigUint;
+use num_traits::{Zero, One};
 use clap::{App, Arg, ArgMatches};
 
 struct Cola2 {
     debug: bool,
     serialize: bool,
-    ret: u128,
-    p: u128,
+    ret: BigUint,
+    p: BigUint,
 }
+
 
 impl Cola2 {
 
-    fn is_on_octet_boundary(&self) -> bool {
-        self.ret % 8 == 0 && self.ret != 0
-    }
-
     //opb is operation A for collats' map
-    fn opa(&mut self, p :u128) -> u128 {
+    fn opa(&mut self, p :BigUint) -> BigUint {
         if self.serialize {
             print!("A");
         } else if self.debug {
             print!("{} -> ", p);
         }
-        self.f(p / 2)
+        self.f(p / BigUint::from(2u8))
     }
 
     //opb is operation B for collats' map
-    fn opb(&mut self, p :u128) -> u128 {
+    fn opb(&mut self, p :BigUint) -> BigUint {
         if self.serialize {
             print!("B");
         } else if self.debug {
             print!("{} -> ", p)
         }
-        self.f(p * 3 + 1)
+        self.f((BigUint::from(3u8) * p) + BigUint::from(1u8))
     }
 
-    fn f (&mut self, p :u128) -> u128 {
-        if p == 0 {
+    fn f (&mut self, p :BigUint) -> BigUint {
+        if p == BigUint::from(0u8) {
             panic!("undef");
         }
-        if p == 1 {
+        if p == BigUint::from(1u8) {
             if self.serialize {
                 println!("");
             } else if self.debug {
@@ -46,29 +45,26 @@ impl Cola2 {
             } else {
                 println!("{} {}", self.p, self.ret);
             }
-            return 0
+            return BigUint::from(0u8)
         }
-        if self.is_on_octet_boundary() {
-            if self.serialize {
-                /*if self.ret % 64 == 0 {
-                    println!("")
-                }*/
-                //print!(" ");
-            } 
-        }
-        self.ret = self.ret + 1;
-        match p % 2 {
-            0 => self.opa(p),
-            1 => self.opb(p),
-            _ => 0,
+        self.ret = self.ret.clone() + BigUint::from(1u8);
+        let zero :BigUint = Zero::zero();
+        let one :BigUint = One::one();
+        let modulo = p.clone() % BigUint::from(2u8);
+        if modulo == zero {
+            self.opa(p)
+        } else if modulo == one {
+            self.opb(p)
+        } else {
+            zero
         }
     }
-    pub fn run (p :u128, debug :bool, serialize :bool) {
+    pub fn run (p :BigUint, debug :bool, serialize :bool) {
         let mut runner = Cola2{
             debug: debug,
             serialize: serialize,
-            ret: 0,
-            p: p,
+            ret: BigUint::from(0u8),
+            p: p.clone(),
         };
         runner.f(p);
     }
@@ -112,7 +108,7 @@ fn main() {
         let line = line.unwrap();
         let mut numbers = line.split_whitespace().collect::<Vec<_>>();
         while let Some(n) = numbers.pop() {
-            if let Ok(n) = n.parse::<u128>() {
+            if let Ok(n) = n.parse::<BigUint>() {
                 Cola2::run(n, app.is_present("debug"), app.is_present("encode"));
             }
         }
